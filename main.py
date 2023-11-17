@@ -3,7 +3,7 @@ import os
 from langchain.chat_models import ChatOpenAI
 
 from src.config.const import OPENAI_API_KEY
-from src.utils.utils import get_pdfLoader, get_docsSplitter, get_vectorstorce, get_RAG,get_prompt
+from src.utils.utils import get_docsSplitter, get_pdfLoader, get_prompt, get_RAG, get_vectorstorce
 
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
@@ -25,7 +25,13 @@ retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k
 llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
 prompt = get_prompt(mode="cs")
 
-answer = get_RAG(retriever=retriever, llm=llm, prompt=prompt, question="Can you make one True or False Quiz using the important information in context?")
+answer = get_RAG(
+    retriever=retriever,
+    llm=llm,
+    prompt=prompt,
+    question="Can you make ten True or False Quiz using the important information in context? you should give me the answer of each Quiz.",
+)
 
 print(answer)
 
+# 6. Agent
