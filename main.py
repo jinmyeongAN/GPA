@@ -1,7 +1,6 @@
 import os
 
 from langchain.chat_models import ChatOpenAI
-
 from src.config.const import OPENAI_API_KEY
 from src.utils.utils import get_docsSplitter, get_pdfLoader, get_prompt, get_RAG, get_vectorstorce
 
