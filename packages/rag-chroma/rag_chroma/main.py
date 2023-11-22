@@ -9,7 +9,9 @@ os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_API_KEY"] = OPENAI_API_KEY
 
 # 1. Load
-pdf_pages = get_pdfLoader(path="/home/jinmyeong/code/GPA/Data", filename="w5-ml.pdf")
+data_path_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(os.path.dirname(os.path.realpath(__file__))))))
+data_name = "w5-ml.pdf"
+pdf_pages = get_pdfLoader(path=os.path.join(data_path_dir, "Data"), filename=data_name)
 
 # 2. Split
 splits = get_docsSplitter(docs=pdf_pages)
