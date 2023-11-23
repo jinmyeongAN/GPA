@@ -4,17 +4,13 @@ from langchain.agents import AgentExecutor
 from langchain.agents.agent_toolkits import create_conversational_retrieval_agent, create_retriever_tool
 from langchain.agents.openai_functions_agent.agent_token_buffer_memory import AgentTokenBufferMemory
 from langchain.agents.openai_functions_agent.base import OpenAIFunctionsAgent
-from langchain.chains import LLMChain, SequentialChain, SimpleSequentialChain
-from langchain.chains.router import MultiPromptChain
-from langchain.chains.router.llm_router import LLMRouterChain, RouterOutputParser
-from langchain.chat_models import ChatOpenAI
+from langchain.chains import LLMChain, SequentialChain
 from langchain.document_loaders import PyPDFLoader
 from langchain.document_loaders.generic import GenericLoader
 from langchain.document_loaders.parsers import GrobidParser
 from langchain.embeddings import OpenAIEmbeddings
-from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder, PromptTemplate
+from langchain.prompts import ChatPromptTemplate, PromptTemplate
 from langchain.schema import StrOutputParser
-from langchain.schema.messages import SystemMessage
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
@@ -100,6 +96,8 @@ def get_agent(retriever, llm, prompt):
     agent_executor = create_conversational_retrieval_agent(llm, tools, verbose=True)
     result = agent_executor({"input": "hi, im bob"})
 
+    print(result)
+
     # This is needed for both the memory and the prompt
     memory_key = "history"
     memory = AgentTokenBufferMemory(memory_key=memory_key, llm=llm)
@@ -126,8 +124,6 @@ def get_agent(retriever, llm, prompt):
         verbose=True,
         return_intermediate_steps=True,
     )
-
-    result = agent_executor({"input": "whats my name"})
 
 
 def get_langchain(llm, selection_prompt, expert_prompt):
@@ -208,5 +204,7 @@ def get_langchain(llm, selection_prompt, expert_prompt):
         chain = LLMChain(llm=llm, prompt=prompt)
         destination_chains[name] = chain
 
-    destinations = [f"{p['name']}: {p['description']}" for p in prompt_infos]
-    destinations_str = "\n".join(destinations)
+    # destinations = [f"{p['name']}: {p['description']}" for p in prompt_infos]
+    # destinations_str = "\n".join(destinations)
+
+    return overall_chain

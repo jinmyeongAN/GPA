@@ -1,52 +1,28 @@
-# Python Template
+# GPA
 
-Template repository for Python project
+## Quick start
 
-## 🚀 Features
+**Install torch** (you SHOULD consider your CUDA version)
 
-### Code Quality
+```$ pip install torch torchvision torchaudio```
 
-- black
-- isort
-- flake8
-- editorconfig
+**Install requirements**
 
-### Github Actions
+```$ pip install -r requirements.txt```
 
-- [release-drafter](https://github.com/release-drafter/release-drafter)
-- Check code quality when PR (`black`, `isort`, `flake8`)
+**Install linter**
 
-### Other
+```$ make style```
 
-- Commit template
-- Issue, PR Template
-- Add dummy test code
-- Auto-close stale issue
+**Set your openAI api key**
 
-## 📄 Guideline
-
-### 1. Setup
-
-- precommit, style, pytest, gitmessage, requirements
-
-```bash
-make setup
+1. Make `const.py` file in `GPA/packages/rag-chroma/rag_chroma/src/config`` directory
+2. fill in the file like followings
+```python
+OPENAI_API_KEY = {YOUR_API_KEY}
 ```
 
-### 2. Writes your own code! ✏️
+**Execute RAG**
 
-Don't forget to update the `README`!
-
-## ⬆️ Contributing
-
-### 1. Test
-
-```bash
-make test
-```
-
-### 2. Execute code formatting & Check lint
-
-```bash
-make style
-```
+1. Go to the `main.py` file in `GPA/packages/rag-chroma/rag_chroma/main.py`
+2. `$ python main.py`
