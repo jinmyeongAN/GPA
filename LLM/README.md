@@ -6,7 +6,7 @@
 
 **Create conda environment**
 
-```$ conda create -y -n trans_pytorch_2.0 python=3.8```
+```$ conda create -y -n trans_pytorch_2.0 python=3.11```
 
 ```$ conda activate trans_pytorch_2.0```
 
