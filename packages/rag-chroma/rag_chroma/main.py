@@ -3,6 +3,7 @@ import os
 from langchain.chat_models import ChatOpenAI
 from src.config.const import OPENAI_API_KEY
 from src.utils.utils import get_docsSplitter, get_pdfLoader, get_prompt, get_RAG, get_vectorstorce
+from langchain.agents.agent_toolkits import create_retriever_tool
 
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
@@ -23,6 +24,15 @@ vectorstore = get_vectorstorce(splits)
 
 # 4. Retrieve
 retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 6})
+
+tool = create_retriever_tool(
+    retriever,
+    "search_state_of_union",
+    "Searches and returns documents regarding the state-of-the-union.",
+)
+tools = [tool]
+
+
 
 # 5. Generate
 llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
