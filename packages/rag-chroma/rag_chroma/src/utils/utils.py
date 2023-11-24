@@ -55,7 +55,7 @@ def get_RAG(retriever, llm, prompt, question):
 
     answer = rag_chain.invoke(question)
 
-    return answer
+    return answer # return rag_chain?
 
 
 def format_docs(docs):
