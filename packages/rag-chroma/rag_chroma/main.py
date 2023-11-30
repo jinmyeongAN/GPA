@@ -1,17 +1,8 @@
 import os
 
-from langchain.agents.agent_toolkits import create_retriever_tool
 from langchain.chat_models import ChatOpenAI
 from src.config.const import OPENAI_API_KEY
-from src.utils.utils import (
-    get_docsSplitter,
-    get_pdfLoader,
-    get_prompt,
-    get_RAG,
-    get_routerChain,
-    get_vectorstorce,
-    prompt_infos,
-)
+from src.utils.utils import get_docsSplitter, get_pdfLoader, get_prompt, get_RAG, get_vectorstorce, get_routerChain, prompt_infos
 
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
