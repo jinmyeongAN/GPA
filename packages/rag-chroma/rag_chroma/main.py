@@ -2,7 +2,7 @@ import os
 
 from langchain.chat_models import ChatOpenAI
 from src.config.const import OPENAI_API_KEY
-from src.utils.utils import get_docsSplitter, get_pdfLoader, get_prompt, get_RAG, get_vectorstorce
+from src.utils.utils import get_docsSplitter, get_pdfLoader, get_prompt, get_RAG, get_vectorstorce, get_routerChain, prompt_infos, get_agent
 
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
@@ -35,6 +35,9 @@ answer = get_RAG(
     question="Can you make ten True or False Quiz using the important information in context? you should give me the answer of each Quiz.",
 )
 
-print(answer)
+# Routing
+chain = get_routerChain(llm=llm, prompt_infos=prompt_infos)
+# chain.run(PDF_files)
 
-# 6. Agent
+# Agent
+agent_executor = get_agent(llm=llm)# agent_executor.run("How many people live in canada as of 2023?")
