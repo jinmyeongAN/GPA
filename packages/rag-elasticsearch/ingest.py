@@ -42,10 +42,13 @@ loader = JSONLoader(
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=250)
 all_splits = text_splitter.split_documents(loader.load())
 
+
+print(all_splits)
+
 # Add to vectorDB
 vectorstore = ElasticsearchStore.from_documents(
     documents=all_splits,
-    embedding=HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2", model_kwargs={"device": "cpu"}),
+    embedding=HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2", model_kwargs={"device": "cuda:3"}),
     **es_connection_details,
     index_name="workplace-search-example",
 )

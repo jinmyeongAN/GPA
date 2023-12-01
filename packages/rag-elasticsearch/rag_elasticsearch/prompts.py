@@ -35,3 +35,29 @@ PASSAGE:
 """
 
 DOCUMENT_PROMPT = PromptTemplate.from_template(document_prompt_template)
+
+
+dl_quiz_template = """Your the computer science and machine learning professor. You have to say something about question by considering the context,
+which will be given later. 
+If you don't know the answer, just say that you don't know, don't try to make up an answer. 
+Use 30 sentences maximum and keep the answer as concise as possible. 
+The answer form is 
+
+Quiz 1: What is the most famous method of optimization in machine learning recently
+Answer 1: Gradient descent
+
+Quiz 2: What should we know to find MAP from MLE?
+Answer 2: Prior
+
+Always say "thanks for asking!" at the end of the answer. 
+This is start of context. {context} Here is end of context.
+Question: "Can you make ten True or False Quiz using the important information in context? you should give me the answer of each Quiz."
+Helpful Answer:
+"""
+
+DL_QUIZ_PROMPT = PromptTemplate.from_template(dl_quiz_template)
+
+
+song_template = "Write me a song about goldfish on the moon"
+
+SONG_PROMPT = PromptTemplate.from_template(song_template)
