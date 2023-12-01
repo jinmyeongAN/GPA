@@ -5,6 +5,7 @@ from langchain.schema.runnable import RunnableMap
 from langserve import RemoteRunnable
 
 elastic = RemoteRunnable("http://localhost:8000/rag-elasticsearch")
+chroma = RemoteRunnable("http://localhost:8000/rag-chroma")
 
 user_id = "username_filename"
 
@@ -44,10 +45,15 @@ Learning rate
 		Random Search for Hyper-Parameter Optimization Bergstra and Bengio, 2012
 """
 
-print(lecture_slide_str)
+#print(lecture_slide_str)
 
-response = elastic.invoke({ "context": lecture_slide_str})
+#response = elastic.invoke({ "context": lecture_slide_str})
+#print(response)
+
+
+response = chroma.invoke({ "context": lecture_slide_str})
 print(response)
+
 
 #response = elastic.stream({ "context": lecture_slide_str})
 #print(response)
