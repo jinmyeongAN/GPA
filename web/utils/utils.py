@@ -24,7 +24,7 @@ def get_pdfLoader(path: str, filename: str, mode: str = "normal"):
     elif mode == "plus":
         loader = PDFPlumberLoaderPlus(os.path.join(path, filename), extract_images=False)
         pages = loader.load()
-    elif mode == "plus_i"
+    elif mode == "plus_i":
         loader = PDFPlumberLoaderPlus(os.path.join(path, filename), extract_images=True)
         pages = loader.load()
     elif mode == "paper":
