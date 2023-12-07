@@ -14,14 +14,20 @@ from langchain.schema import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
+from pdf_loader import PDFPlumberLoaderPlus
 
 
 def get_pdfLoader(path: str, filename: str, mode: str = "normal"):
     if mode == "normal":
         loader = PyPDFLoader(os.path.join(path, filename), extract_images=False)
         pages = loader.load_and_split()
-
-    if mode == "paper":
+    elif mode == "plus":
+        loader = PDFPlumberLoaderPlus(os.path.join(path, filename), extract_images=False)
+        pages = loader.load()
+    elif mode == "plus_i"
+        loader = PDFPlumberLoaderPlus(os.path.join(path, filename), extract_images=True)
+        pages = loader.load()
+    elif mode == "paper":
         loader = GenericLoader.from_filesystem(
             path,
             glob="*",
@@ -29,7 +35,8 @@ def get_pdfLoader(path: str, filename: str, mode: str = "normal"):
             parser=GrobidParser(segment_sentences=False),
         )
         pages = loader.load()
-
+    else:
+        raise ValueError(f"Unsupported mode {mode}.")
     return pages
 
 
