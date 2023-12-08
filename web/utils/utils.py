@@ -14,7 +14,7 @@ from langchain.schema import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
-from pdf_loader import PDFPlumberLoaderPlus
+from .pdf_loader import PDFPlumberLoaderPlus
 
 
 def get_pdfLoader(path: str, filename: str, mode: str = "normal"):
