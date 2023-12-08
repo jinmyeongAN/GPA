@@ -26,13 +26,20 @@ from langchain.utilities import SerpAPIWrapper
 from langchain.chains import LLMChain
 from typing import List, Union
 from langchain.schema import AgentAction, AgentFinish, OutputParserException
+from pdf_loader import PDFPlumberLoaderPlus
 import re
+
 def get_pdfLoader(path: str, filename: str, mode: str = "normal"):
     if mode == "normal":
         loader = PyPDFLoader(os.path.join(path, filename), extract_images=False)
         pages = loader.load_and_split()
-
-    if mode == "paper":
+    elif mode == "plus":
+        loader = PDFPlumberLoaderPlus(os.path.join(path, filename), extract_images=False)
+        pages = loader.load()
+    elif mode == "plus_i":
+        loader = PDFPlumberLoaderPlus(os.path.join(path, filename), extract_images=True)
+        pages = loader.load()
+    elif mode == "paper":
         loader = GenericLoader.from_filesystem(
             path,
             glob="*",
@@ -40,7 +47,8 @@ def get_pdfLoader(path: str, filename: str, mode: str = "normal"):
             parser=GrobidParser(segment_sentences=False),
         )
         pages = loader.load()
-
+    else:
+        raise ValueError(f"Unsupported mode {mode}.")
     return pages
 
 
