@@ -5,6 +5,7 @@ from typing import List, Optional, Mapping, Any, Iterator
 
 import numpy as np
 import pdfplumber.page
+from ftfy import fix_text
 from langchain.docstore.document import Document
 from langchain.document_loaders import PDFPlumberLoader
 from langchain.document_loaders.blob_loaders import Blob
@@ -90,9 +91,10 @@ class PDFPlumberParserPlus(PDFPlumberParser):
         if 'gap_tolerance' not in text_kwargs:
             text_kwargs['gap_tolerance'] = 12
         if 'indent_tolerance' not in text_kwargs:
-            text_kwargs['indent_tolerance'] = 27
+            text_kwargs['indent_tolerance'] = 20
         if 'bullet_point_chars' not in text_kwargs:
-            text_kwargs['bullet_point_chars'] = '•◦‣⁃■□▪▫-○◘◙◎●◦◉◌◍◐◑◒◓◔◕◖◗◘◙◚◛◜◝◞◟◠◡◢◣◤◥◦◧◨◩◪◫◬◭◮◯◰◱◲◳◴◵◶◷◸◹◺◻◼◽◾◿'
+            text_kwargs['bullet_point_chars'] = ('•◦‣⁃■□▪▫-○◘◙◎●◦◉◌◍◐◑◒◓◔◕◖◗◘◙◚◛'
+                                                 '◜◝◞◟◠◡◢◣◤◥◦◧◨◩◪◫◬◭◮◯◰◱◲◳◴◵◶◷◸◹◺◻◼◽◾◿')
 
         sentence_list = []
         indent_num = 0
@@ -115,7 +117,7 @@ class PDFPlumberParserPlus(PDFPlumberParser):
                 bullet_point = True
                 is_bold = False
                 continue
-            if ((word_x1 - text_kwargs['gap_tolerance'] <= word['x0'] <= word_x1 + text_kwargs['gap_tolerance']
+            if ((word_x1 - text_kwargs['gap_tolerance'] <= word['x0'] <= word_x1 + text_kwargs['gap_tolerance'] + 20
                  or (word['x0'] - indent_size <= sent_x0 <= word['x0'] + indent_size
                      and word_x1 > page_width * 0.75
                      and word['size'] - 0.1 <= font_size <= word['size'] + 0.1))
@@ -137,8 +139,7 @@ class PDFPlumberParserPlus(PDFPlumberParser):
             else:  # if word is first word of next sentence
                 if is_bold:
                     sent_str += '*'
-                sentence_list.append(
-                    re.sub(r' +', ' ', re.sub(r'( *\t+ *)+', '\t', sent_str.rstrip().replace('\xa0', ' '))))
+                sentence_list.append(sent_str)
                 # sentence_list.append(re.sub(r'[ \t]+', '\t', sent_str.rstrip().replace('\xa0', ' ')))
                 # sentence_list.append(sent_str.rstrip().replace('\xa0', ' '))
                 if is_title:
@@ -169,13 +170,32 @@ class PDFPlumberParserPlus(PDFPlumberParser):
                     is_bold = False
                 sent_str += word['text']
         if sent_str:
-            page_data = re.sub(r' +', ' ', re.sub(r'( *\t+ *)+', '\t', sent_str.rstrip().replace('\xa0', ' ')))
-            # page_data = re.sub(r'[ \t]+', '\t', sent_str.rstrip().replace('\xa0', ' '))
-            try:
-                _ = int(page_data)  # if sentence is a number, assume it to page number
-            except ValueError:
-                sentence_list.append(page_data)
-        return '\n'.join(sentence_list)
+            sentence_list.append(sent_str)
+
+        sentence_list_fix = []
+        for sentence_idx in range(len(sentence_list)):
+            sentence_list[sentence_idx] = sentence_list[sentence_idx].rstrip().replace('\xa0', ' ')
+            sentence_list[sentence_idx] = re.sub(r'( *\t+ *)+', '\t', sentence_list[sentence_idx])
+            sentence_list[sentence_idx] = re.sub(r' +', ' ', sentence_list[sentence_idx])
+            sentence_list[sentence_idx] = re.sub(r'[\u2200-\u22FF\uE000-\uF8FF]', '', 
+                                                 sentence_list[sentence_idx])
+            sentence_list[sentence_idx] = re.sub(r'\(cid:\d{4}\)', '', sentence_list[sentence_idx])
+            fixed_sentence = ''
+            for char_idx in range(len(sentence_list[sentence_idx])):
+                if ord(sentence_list[sentence_idx][char_idx]) < 65536:
+                    fixed_sentence += sentence_list[sentence_idx][char_idx]
+            fixed_sentence = fix_text(fixed_sentence)
+            is_space = True
+            for char_idx in range(len(fixed_sentence)):
+                if fixed_sentence[char_idx].isalpha():
+                    is_space = False
+                    break
+            if is_space:
+                continue
+            if sentence_list[sentence_idx] == '':
+                continue
+            sentence_list_fix.append(fixed_sentence)
+        return '\n'.join(sentence_list_fix)
 
     def _process_page_content(self, page: pdfplumber.page.Page) -> str:
         """Process the page content based on dedupe."""
@@ -203,7 +223,17 @@ class PDFPlumberParserPlus(PDFPlumberParser):
             else:
                 word_list.append(image_word)
 
-        return self._wordlist_to_text(word_list, page.width)
+        filtered_word_list = []
+        for word in word_list:
+            if word['size'] < 15 and word['size'] != 0:
+                continue
+            if re.fullmatch(r'\(cid:\d{4}\)([ \t]*\(cid:\d{4}\))*', word['text']) is not None:
+                continue
+            filtered_word_list.append(word)
+
+        print(filtered_word_list)
+
+        return self._wordlist_to_text(filtered_word_list, page.width)
 
     def _convert_images_to_words_from_page(self, page: pdfplumber.page.Page) -> list:
         """Extract images from page and get the text with LaTeX-OCR."""
