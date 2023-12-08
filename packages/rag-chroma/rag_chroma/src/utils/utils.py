@@ -26,7 +26,7 @@ from langchain.utilities import SerpAPIWrapper
 from langchain.chains import LLMChain
 from typing import List, Union
 from langchain.schema import AgentAction, AgentFinish, OutputParserException
-from pdf_loader import PDFPlumberLoaderPlus
+from .pdf_loader import PDFPlumberLoaderPlus
 import re
 
 def get_pdfLoader(path: str, filename: str, mode: str = "normal"):
