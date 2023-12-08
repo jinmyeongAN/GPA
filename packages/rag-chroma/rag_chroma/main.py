@@ -2,7 +2,7 @@ import os
 
 from langchain.chat_models import ChatOpenAI
 from src.config.const import OPENAI_API_KEY
-from src.utils.utils import get_docsSplitter, get_pdfLoader, get_prompt, get_RAG, get_vectorstorce, get_routerChain, prompt_infos, get_agent
+from src.utils.utils import get_docsSplitter, get_pdfLoader, get_prompt, get_RAG, get_vectorstorce, format_docs
 
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 # os.environ["LANGCHAIN_TRACING_V2"] = "true"
@@ -32,8 +32,8 @@ answer = get_RAG(
     retriever=retriever,
     llm=llm,
     prompt=prompt,
-    question="Can you make ten multiple choice Quiz using the important information in lecture note? you should give me the answer of each Quiz.",
-)
+    context=format_docs(pdf_pages[:3]),
+) # pdf_pages의 길이가 길면 -> 아웃풋이 다 안 나올 수도 있습니다.
 
 print(answer)
 # Routing

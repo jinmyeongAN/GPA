@@ -26,7 +26,7 @@ from langchain.utilities import SerpAPIWrapper
 from langchain.chains import LLMChain
 from typing import List, Union
 from langchain.schema import AgentAction, AgentFinish, OutputParserException
-from pdf_loader import PDFPlumberLoaderPlus
+from .pdf_loader import PDFPlumberLoaderPlus
 import re
 
 def get_pdfLoader(path: str, filename: str, mode: str = "normal"):
@@ -67,14 +67,17 @@ def get_vectorstorce(all_splits):
     return vectorstore
 
 
-def get_RAG(retriever, llm, prompt, question):
+def get_RAG(retriever, llm, prompt, context):
     rag_chain = (
-        {"context": retriever | format_docs, "question": RunnablePassthrough()} | prompt | llm | StrOutputParser()
+        {"context": RunnablePassthrough()} | prompt | llm | StrOutputParser()
     )
+    answer = rag_chain.invoke(context)
+    # rag_chain = (
+    #     {"context": retriever | format_docs, "question": RunnablePassthrough()} | prompt | llm | StrOutputParser()
+    # )
+    # answer = rag_chain.invoke(question)
 
-    answer = rag_chain.invoke(question)
-
-    return answer  # return rag_chain?
+    return answer
 
 
 def format_docs(docs):
@@ -82,8 +85,9 @@ def format_docs(docs):
 
 def get_quiz_form(quiz_type="mc"):
     if quiz_type == "mc":
+        question = "Can you make 10 number of multiple choice Quiz using the important information in lecture note? you should give me the answer of each Quiz."
         quiz = """
-        Problem:
+        Example quiz:
         For each of the following questions, circle the letter of your choice. Each question has AT LEAST one correct option unless explicitly mentioned. No explanation is required.
 
         You are training a large feedforward neural network (100 layers) on a
@@ -100,10 +104,10 @@ def get_quiz_form(quiz_type="mc"):
         (iii) Add Batch Normalization before every activation
         (iv) Increase the learning rate
 
-        Answer:
+        Example answer:
         The solution is (ii), (iii)
         """
-        return quiz
+        return question, quiz
 
 def get_prompt(mode="cs"):
     if mode == "cs":
@@ -117,14 +121,14 @@ def get_prompt(mode="cs"):
  
         The problem you should make is for graduated student major in machine learning.
         The answer form is followings.
-        Example:
+
         {quiz_example}
 
         Here are lecture notes which you can make use of the question
         Lecture notes: {context}
 
-        Question: {question}
-        Helpful Answer:""".format(context="{context}", question="{question}", quiz_example=get_quiz_form())
+        {question}
+        Helpful Answer:""".format(context="{context}", question=get_quiz_form()[0], quiz_example=get_quiz_form()[1])
 
         rag_prompt_custom = PromptTemplate.from_template(template)
 
