@@ -16,7 +16,7 @@ from langchain.schema import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
-from langchain.agents.agent_toolkits import create_python_agent
+# from langchain.agents.agent_toolkits import create_python_agent
 from langchain.agents import load_tools, initialize_agent
 from langchain.agents import AgentType
 from langchain.agents import Tool, AgentExecutor, LLMSingleActionAgent, AgentOutputParser
@@ -72,25 +72,51 @@ def get_RAG(retriever, llm, prompt, question):
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
+def get_quiz_form(quiz_type="mc"):
+    if quiz_type == "mc":
+        quiz = """
+        Problem:
+        For each of the following questions, circle the letter of your choice. Each question has AT LEAST one correct option unless explicitly mentioned. No explanation is required.
+
+        You are training a large feedforward neural network (100 layers) on a
+        binary classification task, using a sigmoid activation in the final layer, and a mixture
+        of tanh and ReLU activations for all other layers. You notice your weights to a
+        subset of your layers stop updating after the first epoch of training, even though your
+        network has not yet converged. Deeper analysis reveals the gradients to these layers
+        completely, or almost completely, go to zero very early on in training. Which of the
+        following fixes could help? (You also note that your loss is still within a reasonable
+        order of magnitude).
+
+        (i) Increase the size of your training set
+        (ii) Switch the ReLU activations with leaky ReLUs everywhere
+        (iii) Add Batch Normalization before every activation
+        (iv) Increase the learning rate
+
+        Answer:
+        The solution is (ii), (iii)
+        """
+        return quiz
 
 def get_prompt(mode="cs"):
     if mode == "cs":
-        template = """Your the computer science and machine learning professor. You have to say something about question by considering the context,
-        which will be given later. 
-        If you don't know the answer, just say that you don't know, don't try to make up an answer. 
-        Use 30 sentences maximum and keep the answer as concise as possible. 
-        The answer form is 
+        template = """
+        You are a very good computer science and machine learning professor. \
+        You are great at answering computer science and machine learning questions. \
+        You are so good because you are able to break down \
+        hard problems into their component parts, 
+        answer the component parts, and then put them together\
+        to answer the broader question.
+ 
+        The problem you should make is for graduated student major in machine learning.
+        The answer form is followings.
+        Example:
+        {quiz_example}
 
-        Quiz 1: What is the most famous method of optimization in machine learning recently
-        Answer 1: Gradient descent
+        Here are lecture notes which you can make use of the question
+        Lecture notes: {context}
 
-        Quiz 2: What should we know to find MAP from MLE?
-        Answer 2: Prior
-
-        Always say "thanks for asking!" at the end of the answer. 
-        This is start of context. {context} Here is end of context.
         Question: {question}
-        Helpful Answer:"""
+        Helpful Answer:""".format(context="{context}", question="{question}", quiz_example=get_quiz_form())
 
         rag_prompt_custom = PromptTemplate.from_template(template)
 

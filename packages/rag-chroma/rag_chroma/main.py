@@ -5,8 +5,8 @@ from src.config.const import OPENAI_API_KEY
 from src.utils.utils import get_docsSplitter, get_pdfLoader, get_prompt, get_RAG, get_vectorstorce, get_routerChain, prompt_infos, get_agent
 
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
-os.environ["LANGCHAIN_TRACING_V2"] = "true"
-os.environ["LANGCHAIN_API_KEY"] = OPENAI_API_KEY
+# os.environ["LANGCHAIN_TRACING_V2"] = "true"
+# os.environ["LANGCHAIN_API_KEY"] = OPENAI_API_KEY
 
 # 1. Load
 data_path_dir = os.path.dirname(
@@ -32,12 +32,13 @@ answer = get_RAG(
     retriever=retriever,
     llm=llm,
     prompt=prompt,
-    question="Can you make ten True or False Quiz using the important information in context? you should give me the answer of each Quiz.",
+    question="Can you make ten multiple choice Quiz using the important information in lecture note? you should give me the answer of each Quiz.",
 )
 
+print(answer)
 # Routing
-chain = get_routerChain(llm=llm, prompt_infos=prompt_infos)
+# chain = get_routerChain(llm=llm, prompt_infos=prompt_infos)
 # chain.run(PDF_files)
 
 # Agent
-agent_executor = get_agent(llm=llm)# agent_executor.run("How many people live in canada as of 2023?")
+# agent_executor = get_agent(llm=llm)# agent_executor.run("How many people live in canada as of 2023?")
